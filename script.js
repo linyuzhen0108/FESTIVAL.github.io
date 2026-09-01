@@ -81,10 +81,7 @@ $('lantern').onclick = () => {
     toast(document.body.classList.contains('lit') ? '🏮 燈籠已點亮，願前路明亮順遂。' : '🏮 燈籠休息一下，下次再點亮。');
 };
 
-$('wishBtn').onclick = () => {
-    toast('💛 已收下月亮祝福：平安、順心、好事發生。');
-    for (let i = 0; i < 15; i++) fall('✦');
-};
+
 
 function fall(sym) {
     const p = document.createElement('div');
@@ -98,30 +95,6 @@ function fall(sym) {
     setTimeout(() => p.remove(), 8000);
 }
 
-$('starBtn').onclick = () => {
-    toast('✨ 星空已點亮！');
-    for (let j = 0; j < 4; j++) setTimeout(() => {
-        const x = 18 + Math.random() * 64,
-            y = 13 + Math.random() * 28;
-        for (let i = 0; i < 16; i++) {
-            const p = document.createElement('div');
-            p.className = 'petal';
-            p.textContent = '✦';
-            p.style.left = x + 'vw';
-            p.style.top = y + 'svh';
-            p.style.animation = 'none';
-            p.style.fontSize = '14px';
-            const a = i * Math.PI * 2 / 16,
-                r = 45 + Math.random() * 45;
-            p.animate([
-                { transform: 'translate(0,0)', opacity: 1 },
-                { transform: `translate(${Math.cos(a)*r}px,${Math.sin(a)*r}px)`, opacity: 0 }
-            ], { duration: 850, fill: 'forwards' });
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 900);
-        }
-    }, j * 300);
-};
 
 // --- 3. 偷吃月餅大賽 (一二三木頭人) 升級版 ---
 let gameScore = 0;
