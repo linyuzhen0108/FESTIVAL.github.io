@@ -218,20 +218,6 @@ h1 {
     background: rgba(255, 205, 90, .18);
 }
 
-.lantern {
-    position: absolute;
-    z-index: 4;
-    right: 7%;
-    top: 45%;
-    width: 48px;
-    height: 68px;
-    touch-action: manipulation;
-    cursor: pointer;
-    filter: drop-shadow(0 0 11px rgba(255, 174, 55, .35));
-    transition: .3s;
-}
-
-
 /* 彈窗樣式 */
 
 .modal {
@@ -327,7 +313,7 @@ h1 {
 }
 
 
-/* 新增：明顯的規則面板 */
+/* 規則面板 */
 
 .game-rules-box {
     background: rgba(0, 0, 0, 0.6);
@@ -345,16 +331,15 @@ h1 {
 }
 
 
-/* 修改倒數計時動畫樣式 */
+/* 倒數計時動畫樣式 */
 
 .countdown-text {
     position: absolute;
     top: 50%;
-    /* ★ 改成 50% 確保完美垂直置中 */
+    /* 垂直置中 */
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 110px;
-    /* 若覺得字太大可以稍微調小 */
     font-weight: bold;
     color: #ffda79;
     text-shadow: 0 0 25px rgba(255, 218, 121, 0.8), 2px 2px 0px #b37315;
@@ -362,9 +347,8 @@ h1 {
     pointer-events: none;
     display: none;
     text-align: center;
-    /* ★ 新增：確保上下字對齊 */
+    /* 確保上下字對齊 */
     line-height: 1.1;
-    /* ★ 新增：控制「開」跟「始」的間距 */
 }
 
 .countdown-text.pop {
@@ -392,7 +376,7 @@ h1 {
 }
 
 
-/* 新增：預警狀態 (黃燈) */
+/* 預警狀態 (黃燈) */
 
 .game-overlay.warning {
     background: #5c4a0f;
@@ -406,8 +390,49 @@ h1 {
     transform: scale(1.1) rotate(5deg);
 }
 
+/* 黃燈預警：圖片稍微晃動 */
 
-/* 新增：破紀錄提示動畫 */
+.game-overlay.warning .game-character-img {
+    transform: scale(1.1) rotate(5deg);
+}
+
+
+/* 紅燈抓人：圖片瞬間放大 */
+
+.game-overlay.danger .game-character-img {
+    transform: scale(1.25);
+}
+
+.steal-btn {
+    margin-top: 50px;
+    padding: 20px 40px;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 50px;
+    border: none;
+    background: #e9a63b;
+    color: #110d26;
+    box-shadow: 0 8px 0 #b37315;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.steal-btn:active {
+    transform: translateY(8px);
+    box-shadow: 0 0px 0 #b37315;
+}
+
+.game-hint {
+    position: absolute;
+    bottom: 5%;
+    padding: 0 20px;
+    font-size: 12px;
+    color: #887b99;
+    text-align: center;
+}
+
+/* 破紀錄提示動畫 */
 
 .new-record-msg {
     display: block;
@@ -431,7 +456,7 @@ h1 {
 }
 
 
-/* 紅綠燈：被抓到的紅色背景 */
+/* 紅燈：紅色背景 */
 
 .game-header {
     position: absolute;
@@ -471,62 +496,17 @@ h1 {
 }
 
 
-/* 替換原本的 .game-character 相關樣式 */
+/* .game-character 樣式 */
 
 .game-character-img {
     width: 160px;
     height: 160px;
     object-fit: contain;
-    /* 保持圖片比例不變形 */
     transition: transform 0.1s;
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
     user-select: none;
     -webkit-user-drag: none;
 }
-
-
-/* 黃燈預警：圖片稍微晃動 */
-
-.game-overlay.warning .game-character-img {
-    transform: scale(1.1) rotate(5deg);
-}
-
-
-/* 紅燈抓人：圖片瞬間放大，營造壓迫感 */
-
-.game-overlay.danger .game-character-img {
-    transform: scale(1.25);
-}
-
-.steal-btn {
-    margin-top: 50px;
-    padding: 20px 40px;
-    font-size: 24px;
-    font-weight: bold;
-    border-radius: 50px;
-    border: none;
-    background: #e9a63b;
-    color: #110d26;
-    box-shadow: 0 8px 0 #b37315;
-    cursor: pointer;
-    touch-action: manipulation;
-    transition: transform 0.1s, box-shadow 0.1s;
-}
-
-.steal-btn:active {
-    transform: translateY(8px);
-    box-shadow: 0 0px 0 #b37315;
-}
-
-.game-hint {
-    position: absolute;
-    bottom: 5%;
-    padding: 0 20px;
-    font-size: 12px;
-    color: #887b99;
-    text-align: center;
-}
-
 
 /* 排行榜樣式 */
 
@@ -636,7 +616,7 @@ h1 {
 }
 
 
-/* === 月兔占卜系統樣式 === */
+/*  月兔占卜樣式  */
 
 .divination-box {
     background: #1c103f;
@@ -654,17 +634,13 @@ h1 {
 
 .divination-animation-img {
     width: 120px;
-    /* 可以依照你的 moon.png 比例微調大小 */
     height: 120px;
     object-fit: contain;
     margin: 20px auto;
-    /* 確保圖片在彈窗中水平置中 */
     display: block;
     animation: shakeAnim 0.5s ease-in-out infinite alternate;
     filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.4));
-    /* 加入淡淡的金色發光效果 */
     -webkit-user-drag: none;
-    /* 防止手機端不小心拖曳到圖片 */
 }
 
 
@@ -714,12 +690,11 @@ h1 {
 }
 
 
-/* === 開場煙火特效 (終極保證版) === */
+/* 開場煙火特效 */
 
 .firework-particle {
     position: fixed;
     z-index: 99999;
-    /* 加到十萬級別，絕對在最上面 */
     width: 6px;
     height: 6px;
     border-radius: 50%;
