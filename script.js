@@ -38,6 +38,7 @@ $('confirmNameBtn').onclick = () => {
     $('displayPlayerName').textContent = playerName;
     $('entryModal').classList.remove('show');
     toast(`歡迎，${playerName}！祝您中秋快樂！`);
+    launchFireworks();
 };
 
 // --- 2. 原版賀卡互動特效 ---
@@ -113,20 +114,21 @@ const countdownDisplay = $('countdownDisplay');
 
 // 點擊開始按鈕
 $('startGameBtn').onclick = () => {
-    gameOverlay.className = 'game-overlay show'; // 顯示遊戲畫面
+    gameOverlay.className = 'game-overlay show';
     scoreDisplay.textContent = "0";
-    gameRabbit.textContent = '🐇';
-    gameStatusText.textContent = '準備中...';
 
-    // ★ 關鍵修復：清除上一次遊戲結束時殘留的隱藏設定 ★
+    // ★ 將原本的 textContent 改為切換圖片 src ★
+    gameRabbit.src = 'rabbit.png';
+
+    gameStatusText.textContent = '準備中...';
     countdownDisplay.style.display = '';
 
-    // 倒數期間先禁用偷吃按鈕
     stealBtn.disabled = true;
     stealBtn.style.opacity = '0.5';
 
-    startCountdown(); // 呼叫倒數函數
+    startCountdown();
 };
+
 
 // 倒數計時邏輯
 function startCountdown() {
@@ -137,13 +139,14 @@ function startCountdown() {
             // 顯示 3, 2, 1
             countdownDisplay.textContent = count;
             countdownDisplay.className = 'countdown-text';
-            void countdownDisplay.offsetWidth; // 觸發重繪以重置動畫
+            void countdownDisplay.offsetWidth; // 觸發重繪
             countdownDisplay.className = 'countdown-text pop';
             count--;
             setTimeout(tick, 1000);
         } else {
-            // 顯示 START!
-            countdownDisplay.textContent = '開始!';
+            // ★ 修改這裡：用 innerHTML 加入 <br> 讓字直排
+            countdownDisplay.innerHTML = '開<br>始';
+
             countdownDisplay.className = 'countdown-text';
             void countdownDisplay.offsetWidth;
             countdownDisplay.className = 'countdown-text pop';
@@ -158,7 +161,6 @@ function startCountdown() {
 
     tick(); // 啟動倒數
 }
-
 // 實際開始遊戲
 function actualStartGame() {
     gameScore = 0;
@@ -208,25 +210,22 @@ function scheduleRabbitTurn() {
 // 更新遊戲畫面狀態
 function updateRabbitUI() {
     if (rabbitState === 2) {
-        // 紅燈：抓人
-        gameRabbit.textContent = '🐰';
-        gameRabbit.style.transform = 'scale(1.2)';
+        // 紅燈：轉正面看人
+        gameRabbit.src = 'see.png';
         gameStatusText.textContent = '盯——！(停手)';
         gameOverlay.className = 'game-overlay show danger';
     } else if (rabbitState === 1) {
         // 黃燈：預警
-        gameRabbit.textContent = '🐇';
+        gameRabbit.src = 'rabbit.png';
         gameStatusText.textContent = '⚠️ 玉兔豎起耳朵... (準備停手)';
         gameOverlay.className = 'game-overlay show warning';
     } else {
-        // 綠燈：安全
-        gameRabbit.textContent = '🐇';
-        gameRabbit.style.transform = 'scale(1)';
+        // 綠燈：背對安全
+        gameRabbit.src = 'rabbit.png';
         gameStatusText.textContent = '玉兔搗藥中...(快偷吃)';
         gameOverlay.className = 'game-overlay show';
     }
 }
-
 // 點擊「偷吃月餅」按鈕
 $('stealBtn').onclick = () => {
     if (!gameActive) return;
@@ -253,59 +252,72 @@ function gameOver() {
     saveScoreAndShowLeaderboard();
 }
 
-// --- 4. 排行榜系統與結算 ---
-function saveScoreAndShowLeaderboard() {
-    let leaderboard = JSON.parse(localStorage.getItem('mooncake_leaderboard') || '[]');
-
-    // 取得歷史最高分，判斷是否破紀錄
-    const currentHighScore = leaderboard.length > 0 ? leaderboard[0].score : 0;
-    const isNewRecord = gameScore > currentHighScore && gameScore > 0;
-
-    // 建立本次紀錄的物件
-    const currentEntry = { name: playerName, score: gameScore, date: new Date().getTime() };
-    leaderboard.push(currentEntry);
-
-    // 排序：分數由高到低，分數相同則新紀錄排前面 (b.date - a.date)
-    leaderboard.sort((a, b) => b.score - a.score || b.date - a.date);
-
-    // 找出本次遊玩的實際排名 (在所有歷史紀錄中的名次)
-    const currentRank = leaderboard.indexOf(currentEntry) + 1;
-
-    // 只保留前 10 名存入 LocalStorage 與顯示
-    leaderboard = leaderboard.slice(0, 10);
-    localStorage.setItem('mooncake_leaderboard', JSON.stringify(leaderboard));
-
-    // 顯示結算文字、本次排名與破紀錄特效
-    const resultMsg = $('gameResultMsg');
-    let rankText = currentRank <= 10 ? `🏆 本次排名：第 <b>${currentRank}</b> 名` : `💪 本次排名：第 <b>${currentRank}</b> 名 (未進榜，再接再厲！)`;
-
-    if (isNewRecord) {
-        resultMsg.innerHTML = `遊戲結束！你吃了 <b>${gameScore}</b> 顆月餅🥮<br>${rankText}<br><span class="new-record-msg">🎉 恭喜打破全場最高分紀錄！🎉</span>`;
-        toast(`破紀錄啦！吃了 ${gameScore} 顆！`);
-    } else {
-        resultMsg.innerHTML = `被抓到了！本次偷吃：<b>${gameScore}</b> 顆月餅🥮<br><span style="color: #ffda79; font-size: 15px; display: inline-block; margin-top: 5px;">${rankText}</span>`;
-        toast(`被玉兔抓到了！`);
-    }
-
-    renderLeaderboard(leaderboard);
-
-    // --- 防誤觸機制 ---
+// --- 4. 排行榜系統與結算 (雲端資料庫版) ---
+async function saveScoreAndShowLeaderboard() {
+    // 1. 防誤觸機制先啟動
     const replayBtn = $('replayBtn');
     const closeBtn = $('closeLeaderboardBtn');
-
     replayBtn.disabled = true;
     closeBtn.disabled = true;
     replayBtn.style.opacity = '0.5';
     closeBtn.style.opacity = '0.5';
-
     $('leaderboardModal').classList.add('show');
 
+    // 介面先顯示讀取中
+    const resultMsg = $('gameResultMsg');
+    resultMsg.innerHTML = `連線至月球資料庫中... 🌕`;
+    $('leaderboardList').innerHTML = '<p style="text-align:center;">資料讀取中...</p>';
+
+    try {
+        // 2. 如果分數大於 0，將分數寫入雲端資料庫
+        if (gameScore > 0) {
+            await db.collection("mooncake_scores").add({
+                name: playerName,
+                score: gameScore,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+
+        // 3. 從雲端抓取「全球前 10 名」的分數
+        const snapshot = await db.collection("mooncake_scores")
+            .orderBy("score", "desc") // 分數由高到低
+            .limit(10) // 只抓前 10 名
+            .get();
+
+        let leaderboard = [];
+        snapshot.forEach((doc) => {
+            leaderboard.push(doc.data());
+        });
+
+        // 4. 判斷本次成績的文字顯示
+        let currentRankText = "";
+        const rankIndex = leaderboard.findIndex(entry => entry.score <= gameScore && entry.name === playerName);
+
+        if (rankIndex !== -1) {
+            currentRankText = `🏆 本次全球排名：第 <b>${rankIndex + 1}</b> 名`;
+            toast(`擠進全球前 10 名啦！吃了 ${gameScore} 顆！`);
+        } else {
+            currentRankText = `💪 本次偷吃：<b>${gameScore}</b> 顆 (未擠進全球前 10)`;
+            toast(`被抓到了！吃了 ${gameScore} 顆！`);
+        }
+
+        resultMsg.innerHTML = `遊戲結束！<br><span style="color: #ffda79; font-size: 15px; display: inline-block; margin-top: 5px;">${currentRankText}</span>`;
+
+        // 5. 渲染雲端排行榜
+        renderLeaderboard(leaderboard);
+
+    } catch (error) {
+        console.error("資料庫連線錯誤:", error);
+        resultMsg.innerHTML = `資料庫連線失敗，請檢查網路 😢`;
+    }
+
+    // 6. 解除防誤觸按鈕
     setTimeout(() => {
         replayBtn.disabled = false;
         closeBtn.disabled = false;
         replayBtn.style.opacity = '1';
         closeBtn.style.opacity = '1';
-    }, 1000);
+    }, 1500);
 }
 
 // ★ 補回遺失的生成排行榜畫面函數 ★
@@ -349,7 +361,7 @@ $('closeLeaderboardBtn').onclick = () => {
 
 // --- 5. 月兔中秋占卜系統 ---
 
-// 籤詩資料庫 (可以自行新增或修改)
+// 籤詩資料庫 
 const fortunes = [
     { level: "大吉 🌕", text: "滿月賜福，好運爆棚！近期將有意想不到的好消息降臨，財運與桃花雙豐收！" },
     { level: "上吉 🐇", text: "玉兔送安，諸事順遂。工作或學業上的努力即將獲得回報，繼續保持現在的步調！" },
@@ -396,3 +408,57 @@ $('closeDivinationBtn').onclick = () => {
     $('divinationModal').classList.remove('show');
     toast('玉兔說：心誠則靈，祝您好運！🐰');
 };
+
+
+// --- 6. 開場煙火特效 (終極保證版) ---
+function launchFireworks() {
+    console.log("🎆 準備發射煙火！"); // 檢查用
+    const container = document.body;
+    const colors = ['#ffda79', '#ff9ff3', '#feca57', '#48dbfb', '#1dd1a1', '#ff7675'];
+
+    const numFireworks = 5 + Math.floor(Math.random() * 4); // 發射 5~8 朵
+
+    for (let f = 0; f < numFireworks; f++) {
+        setTimeout(() => {
+            console.log(`發射第 ${f+1} 朵煙火！`); // 檢查用
+
+            // ★ 改用絕對像素 (px)，避免手機瀏覽器 Bug
+            const screenW = window.innerWidth;
+            const screenH = window.innerHeight;
+
+            // 讓煙火隨機出現在畫面中上方的區域
+            const startX = (screenW * 0.15) + Math.random() * (screenW * 0.7);
+            const startY = (screenH * 0.1) + Math.random() * (screenH * 0.4);
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            const particlesCount = 35 + Math.floor(Math.random() * 20);
+
+            for (let i = 0; i < particlesCount; i++) {
+                const p = document.createElement('div');
+                p.className = 'firework-particle';
+
+                // ★ 直接用 JS 強制把顏色跟發光綁上去
+                p.style.backgroundColor = color;
+                p.style.boxShadow = `0 0 8px 2px ${color}`;
+
+                p.style.left = startX + 'px';
+                p.style.top = startY + 'px';
+
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 60 + Math.random() * 100;
+
+                p.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+                p.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+
+                const duration = 0.8 + Math.random() * 0.7;
+                p.style.animation = `explode ${duration}s ease-out forwards`;
+
+                container.appendChild(p);
+
+                setTimeout(() => {
+                    if (p.parentNode) p.remove();
+                }, duration * 1000 + 100);
+            }
+        }, f * 500 + Math.random() * 300); // 每朵間隔 0.5 秒左右
+    }
+}
