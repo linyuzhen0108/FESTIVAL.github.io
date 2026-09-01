@@ -165,7 +165,7 @@ button {
 }
 
 .eyebrow {
-    font-size: 18px;
+    font-size: 24px;
     letter-spacing: .25em;
     color: #e9c66f;
 }
@@ -218,41 +218,6 @@ h1 {
     background: rgba(255, 205, 90, .18);
 }
 
-.bunny {
-    position: absolute;
-    z-index: 4;
-    font-size: 54px;
-    filter: drop-shadow(0 6px 7px rgba(0, 0, 0, .25));
-    touch-action: manipulation;
-    animation: bob 3s ease-in-out infinite;
-    cursor: pointer;
-}
-
-.b1 {
-    left: 6%;
-    bottom: 33svh;
-}
-
-.b2 {
-    right: 5%;
-    bottom: 34svh;
-    font-size: 63px;
-    animation-delay: -1.2s;
-}
-
-.b3 {
-    left: 37%;
-    bottom: 30svh;
-    font-size: 42px;
-    animation-delay: -2s;
-}
-
-@keyframes bob {
-    50% {
-        transform: translateY(-7px);
-    }
-}
-
 .lantern {
     position: absolute;
     z-index: 4;
@@ -264,40 +229,6 @@ h1 {
     cursor: pointer;
     filter: drop-shadow(0 0 11px rgba(255, 174, 55, .35));
     transition: .3s;
-}
-
-.lantern .body {
-    width: 43px;
-    height: 48px;
-    margin: auto;
-    border-radius: 45%;
-    background: #c87928;
-    border: 2px solid #f0bd5a;
-    position: relative;
-}
-
-.lantern .body:after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 0;
-    height: 100%;
-    border-left: 2px solid rgba(255, 240, 170, .38);
-}
-
-.lantern .cap {
-    width: 31px;
-    height: 7px;
-    margin: auto;
-    background: #e8ae4b;
-    border-radius: 5px;
-}
-
-.lantern .tassel {
-    width: 2px;
-    height: 17px;
-    background: #e2a33d;
-    margin: auto;
 }
 
 
@@ -414,21 +345,26 @@ h1 {
 }
 
 
-/* 新增：倒數計時動畫 */
+/* 修改倒數計時動畫樣式 */
 
 .countdown-text {
     position: absolute;
-    top: 45%;
+    top: 50%;
+    /* ★ 改成 50% 確保完美垂直置中 */
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 120px;
+    font-size: 110px;
+    /* 若覺得字太大可以稍微調小 */
     font-weight: bold;
     color: #ffda79;
     text-shadow: 0 0 25px rgba(255, 218, 121, 0.8), 2px 2px 0px #b37315;
     z-index: 100;
     pointer-events: none;
-    /* 讓點擊穿透，不會擋住按鈕 */
     display: none;
+    text-align: center;
+    /* ★ 新增：確保上下字對齊 */
+    line-height: 1.1;
+    /* ★ 新增：控制「開」跟「始」的間距 */
 }
 
 .countdown-text.pop {
@@ -532,6 +468,34 @@ h1 {
     transition: transform 0.1s;
     user-select: none;
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+}
+
+
+/* 替換原本的 .game-character 相關樣式 */
+
+.game-character-img {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    /* 保持圖片比例不變形 */
+    transition: transform 0.1s;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+
+/* 黃燈預警：圖片稍微晃動 */
+
+.game-overlay.warning .game-character-img {
+    transform: scale(1.1) rotate(5deg);
+}
+
+
+/* 紅燈抓人：圖片瞬間放大，營造壓迫感 */
+
+.game-overlay.danger .game-character-img {
+    transform: scale(1.25);
 }
 
 .steal-btn {
@@ -688,11 +652,23 @@ h1 {
 
 /* 搖晃動畫 */
 
-.divination-animation {
-    font-size: 60px;
-    margin: 30px 0;
+.divination-animation-img {
+    width: 120px;
+    /* 可以依照你的 moon.png 比例微調大小 */
+    height: 120px;
+    object-fit: contain;
+    margin: 20px auto;
+    /* 確保圖片在彈窗中水平置中 */
+    display: block;
     animation: shakeAnim 0.5s ease-in-out infinite alternate;
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.4));
+    /* 加入淡淡的金色發光效果 */
+    -webkit-user-drag: none;
+    /* 防止手機端不小心拖曳到圖片 */
 }
+
+
+/* 搖晃動畫*/
 
 @keyframes shakeAnim {
     from {
@@ -735,4 +711,29 @@ h1 {
     color: #e6dbff;
     line-height: 1.8;
     padding: 0 10px;
+}
+
+
+/* === 開場煙火特效 (終極保證版) === */
+
+.firework-particle {
+    position: fixed;
+    z-index: 99999;
+    /* 加到十萬級別，絕對在最上面 */
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+}
+
+@keyframes explode {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) scale(0);
+        opacity: 0;
+    }
 }
