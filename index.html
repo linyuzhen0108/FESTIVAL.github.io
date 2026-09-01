@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+    <meta name="theme-color" content="#0d0a20">
+    <title>月圓人團圓｜中秋電子賀卡 & 偷吃月餅大賽</title>
+    <!-- 1. 引入外部 CSS 檔案 -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- 主畫面賀卡 -->
+    <div class="scene" id="scene">
+        <div class="stars" id="stars"></div>
+        <div class="moon" id="moon" aria-label="月亮">
+            <span class="crater c1"></span><span class="crater c2"></span><span class="crater c3"></span><span class="crater c4"></span>
+        </div>
+        <div class="cloud one"></div>
+        <div class="cloud two"></div>
+
+        <!-- 背景玉兔點擊彩蛋 -->
+        <div class="bunny b1" data-msg="🐇 玉兔祝您：月圓人團圓，平安常相伴！">🐇</div>
+        <div class="bunny b2" data-msg="🐰 玉兔祝您：好事成雙，幸福滿滿！">🐰</div>
+        <div class="bunny b3" data-msg="🐇 玉兔祝您：心之所向，都能圓滿！">🐇</div>
+
+        <div class="lantern" id="lantern" aria-label="點亮燈籠">
+            <div class="cap"></div>
+            <div class="body"></div>
+            <div class="tassel"></div>
+        </div>
+
+        <section class="card">
+            <div class="eyebrow">妤蓁 祝你</div>
+            <h1>中秋快樂</h1>
+            <div class="subtitle">HAPPY MID-AUTUMN FESTIVAL</div>
+            <div class="wish">
+                親愛的 <span class="recipient" id="displayPlayerName">玩家</span>，<br> 願月光捎來一份溫暖祝福，
+                <br>月圓人團圓，平安喜樂。
+            </div>
+            <div class="actions">
+                <button id="wishBtn">🌙 收下祝福</button>
+                <button id="starBtn">✨ 點亮星空</button>
+                <!-- 這是原本的遊戲按鈕 -->
+                <button id="startGameBtn" style="grid-column: span 2; background: rgba(255, 100, 100, 0.2); border-color: #ff8c8c;">
+                    🎮 挑戰：偷吃月餅大賽 (一二三木頭人)
+                </button>
+
+                <!-- 新增：月兔占卜按鈕 -->
+                <button id="divinationBtn" style="grid-column: span 2; background: rgba(180, 100, 255, 0.2); border-color: #c78cff;">
+                    🔮 月兔中秋占卜
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- 2. 入場提示：一進入網站就要求輸入名字 -->
+    <div class="modal show" id="entryModal">
+        <div class="modalbox">
+            <h2>你是誰？</h2>
+            <p>請輸入您的大名，準備接收祝福與挑戰！</p>
+            <input id="playerNameInput" placeholder="輸入您的暱稱 (例如: 月餅大盜)" maxlength="15">
+            <div class="modal-actions">
+                <button id="confirmNameBtn">進入</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 遊戲畫面 (預設隱藏) -->
+    <div class="game-overlay" id="gameOverlay">
+        <div class="game-header">
+            <h3>偷吃月餅大賽 🥮</h3>
+            <p>分數: <span id="gameScore">0</span></p>
+        </div>
+
+        <div class="game-status" id="gameStatusText">玉兔搗藥中...(可以偷吃)</div>
+        <div class="game-character" id="gameRabbit">🐇</div>
+
+        <button class="steal-btn" id="stealBtn">偷吃月餅！🥮</button>
+        <!-- 新增：倒數計時大字 -->
+        <div id="countdownDisplay" class="countdown-text"></div>
+    </div>
+
+    <!-- 4. 排行榜畫面 -->
+    <div class="modal" id="leaderboardModal">
+        <div class="modalbox leaderboard-box">
+            <h2>🏆 偷吃月餅排行榜</h2>
+
+            <!-- 新增這行：用來顯示本次成績與破紀錄提示 -->
+            <div id="gameResultMsg" style="margin-bottom: 15px; font-size: 16px; color: #fff;"></div>
+
+            <div id="leaderboardList" class="leaderboard-list">
+                <!-- 排行榜資料會由 JS 生成 -->
+            </div>
+            <div class="modal-actions">
+                <button id="replayBtn">再玩一次</button>
+                <button id="closeLeaderboardBtn" style="background: #3a2e50;">回賀卡</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 5. 月兔占卜畫面 (預設隱藏) -->
+    <div class="modal" id="divinationModal">
+        <div class="modalbox divination-box">
+            <h2 id="divinationTitle">🔮 玉兔為您求籤中...</h2>
+
+            <!-- 占卜動畫 -->
+            <div class="divination-animation" id="divinationAnim">🐇✨</div>
+
+            <!-- 占卜結果 -->
+            <div class="divination-result" id="divinationResult" style="display: none;">
+                <div class="fortune-level" id="fortuneLevel">大吉</div>
+                <p class="fortune-text" id="fortuneText">籤詩內容...</p>
+            </div>
+
+            <div class="modal-actions">
+                <button id="closeDivinationBtn" style="display: none; background: #3a2e50;">收下好運</button>
+            </div>
+        </div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <!-- 引入外部 JS 檔案 -->
+    <script src="script.js"></script>
+</body>
+
+</html>
