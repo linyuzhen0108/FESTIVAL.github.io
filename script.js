@@ -1,3 +1,27 @@
+
+// --- 0. 初始化 Firebase 資料庫 ---
+let db = null;
+
+try {
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfpe9SI8KU9IFO_Sqy5rbBEZph_p7fxlA",
+        authDomain: "festival-832b2.firebaseapp.com",
+        databaseURL: "https://festival-832b2-default-rtdb.firebaseio.com",
+        projectId: "festival-832b2",
+        storageBucket: "festival-832b2.firebasestorage.app",
+        messagingSenderId: "690417444780",
+        appId: "1:690417444780:web:86788bb34223109caabc09",
+        measurementId: "G-L11EPLT8ZC"
+    };
+
+    // 初始化 v8 版本的 Firebase
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    console.log("🔥 Firebase 資料庫連線成功！");
+} catch (error) {
+    console.error("Firebase 初始化失敗：", error);
+}
+
 // 共用工具函數
 const $ = id => document.getElementById(id);
 const toastEl = $('toast');
