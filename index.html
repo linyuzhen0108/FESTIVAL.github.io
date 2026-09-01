@@ -117,14 +117,11 @@
     </div>
     <div class="toast" id="toast"></div>
 
-    <!-- Firebase 的 CDN -->
+    <!-- 1. Firebase 核心 (v8 版本) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <!-- 2. Firebase 資料庫功能 (v8 版本) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js"; import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js"; const firebaseConfig = { apiKey: "AIzaSyCfpe9SI8KU9IFO_Sqy5rbBEZph_p7fxlA",
-        authDomain: "festival-832b2.firebaseapp.com", databaseURL: "https://festival-832b2-default-rtdb.firebaseio.com", projectId: "festival-832b2", storageBucket: "festival-832b2.firebasestorage.app", messagingSenderId: "690417444780", appId: "1:690417444780:web:86788bb34223109caabc09",
-        measurementId: "G-L11EPLT8ZC" }; const app = initializeApp(firebaseConfig); const analytics = getAnalytics(app);
-    </script>
+
 
     <!-- 引入外部 JS 檔案 -->
     <script src="script.js"></script>
