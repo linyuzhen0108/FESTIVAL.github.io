@@ -20,10 +20,7 @@
         <div class="cloud one"></div>
         <div class="cloud two"></div>
 
-        <!-- 背景玉兔點擊彩蛋 -->
-        <div class="bunny b1" data-msg="🐇 玉兔祝您：月圓人團圓，平安常相伴！">🐇</div>
-        <div class="bunny b2" data-msg="🐰 玉兔祝您：好事成雙，幸福滿滿！">🐰</div>
-        <div class="bunny b3" data-msg="🐇 玉兔祝您：心之所向，都能圓滿！">🐇</div>
+
 
         <div class="lantern" id="lantern" aria-label="點亮燈籠">
             <div class="cap"></div>
@@ -40,14 +37,13 @@
                 <br>月圓人團圓，平安喜樂。
             </div>
             <div class="actions">
-                <button id="wishBtn">🌙 收下祝福</button>
-                <button id="starBtn">✨ 點亮星空</button>
-                <!-- 這是原本的遊戲按鈕 -->
+
+                <!-- 偷吃月餅大賽 -->
                 <button id="startGameBtn" style="grid-column: span 2; background: rgba(255, 100, 100, 0.2); border-color: #ff8c8c;">
                     🎮 挑戰：偷吃月餅大賽 (一二三木頭人)
                 </button>
 
-                <!-- 新增：月兔占卜按鈕 -->
+                <!-- 月兔占卜按鈕 -->
                 <button id="divinationBtn" style="grid-column: span 2; background: rgba(180, 100, 255, 0.2); border-color: #c78cff;">
                     🔮 月兔中秋占卜
                 </button>
@@ -75,7 +71,7 @@
         </div>
 
         <div class="game-status" id="gameStatusText">玉兔搗藥中...(可以偷吃)</div>
-        <div class="game-character" id="gameRabbit">🐇</div>
+        <img class="game-character-img" id="gameRabbit" src="rabbit.png" alt="月兔">
 
         <button class="steal-btn" id="stealBtn">偷吃月餅！🥮</button>
         <!-- 新增：倒數計時大字 -->
@@ -106,8 +102,7 @@
         <div class="modalbox divination-box">
             <h2 id="divinationTitle">🔮 玉兔為您求籤中...</h2>
 
-            <!-- 占卜動畫 -->
-            <div class="divination-animation" id="divinationAnim">🐇✨</div>
+            <img class="divination-animation-img" id="divinationAnim" src="moon.png" alt="求籤中">
 
             <!-- 占卜結果 -->
             <div class="divination-result" id="divinationResult" style="display: none;">
@@ -122,8 +117,18 @@
     </div>
     <div class="toast" id="toast"></div>
 
+    <!-- Firebase 的 CDN -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js"; import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js"; const firebaseConfig = { apiKey: "AIzaSyCfpe9SI8KU9IFO_Sqy5rbBEZph_p7fxlA",
+        authDomain: "festival-832b2.firebaseapp.com", databaseURL: "https://festival-832b2-default-rtdb.firebaseio.com", projectId: "festival-832b2", storageBucket: "festival-832b2.firebasestorage.app", messagingSenderId: "690417444780", appId: "1:690417444780:web:86788bb34223109caabc09",
+        measurementId: "G-L11EPLT8ZC" }; const app = initializeApp(firebaseConfig); const analytics = getAnalytics(app);
+    </script>
+
     <!-- 引入外部 JS 檔案 -->
     <script src="script.js"></script>
+
 </body>
 
 </html>
