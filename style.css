@@ -58,10 +58,7 @@ button {
     width: min(62vw, 250px);
     height: min(62vw, 250px);
     border-radius: 50%;
-    background: radial-gradient(circle at 34% 30%, #fff6bd 0 9%, #ffd86d 48%, #e9a63b 100%);
-    box-shadow: 0 0 38px rgba(255, 214, 104, .55), 0 0 100px rgba(255, 194, 75, .2);
-    transition: transform .3s;
-    z-index: 1;
+    object-fit: cover;
 }
 
 .moon:after {
@@ -154,7 +151,10 @@ button {
     z-index: 5;
     left: 5%;
     right: 5%;
-    bottom: max(22px, env(safe-area-inset-bottom));
+    bottom: calc(4vh + env(safe-area-inset-bottom));
+    height: 50vh;
+    display: flex;
+    flex-direction: column;
     padding: 25px 18px 20px;
     text-align: center;
     background: rgba(13, 10, 32, .58);
@@ -203,20 +203,37 @@ h1 {
 }
 
 .actions button {
-    min-height: 44px;
-    border: 1px solid rgba(255, 215, 120, .28);
-    border-radius: 13px;
-    background: rgba(255, 205, 90, .08);
-    color: #fff6d5;
-    font-size: 13px;
+    min-height: 48px;
+    border-radius: 15px;
     cursor: pointer;
     touch-action: manipulation;
+    margin-bottom: 18px;
+    width: 100%;
+    background: linear-gradient(180deg, #ffda79 0%, #f39c12 100%);
+    border: 2px solid #fff;
+    color: #fff6d5;
+    font-size: 15px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    box-shadow: 0 6px 0 #d35400, 0 10px 15px rgba(243, 156, 18, 0.4);
+    transition: all 0.1s ease;
+}
+
+
+/* 確保最後一個按鈕底下不用再加多餘的空白 */
+
+.actions button:last-child {
+    margin-bottom: 0;
 }
 
 .actions button:active {
-    transform: scale(.97);
-    background: rgba(255, 205, 90, .18);
+    /* 5. 真實物理按壓回饋：取代原本的 scale(.97)，改成把底座壓平 */
+    transform: translateY(6px);
+    box-shadow: 0 0 0 #d35400, 0 2px 5px rgba(243, 156, 18, 0.4);
+    background: #f39c12;
+    /* 按下去的時候顏色稍微變深一點點 */
 }
+
 
 /* 彈窗樣式 */
 
@@ -290,6 +307,25 @@ h1 {
 }
 
 
+/* 署名 */
+
+.agent-signature {
+    position: absolute;
+    top: 30px;
+    /* ★ 距離畫面頂端 25px */
+    bottom: auto;
+    width: 100%;
+    text-align: center;
+    color: #ffda79;
+    font-size: 15px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-shadow: 0 0 5px rgba(255, 218, 121, 0.5);
+    z-index: 99;
+    pointer-events: none;
+}
+
+
 /* 遊戲畫面 */
 
 .game-overlay {
@@ -313,7 +349,7 @@ h1 {
 }
 
 
-/* 規則面板 */
+/* 新增：明顯的規則面板 */
 
 .game-rules-box {
     background: rgba(0, 0, 0, 0.6);
@@ -331,15 +367,16 @@ h1 {
 }
 
 
-/* 倒數計時動畫樣式 */
+/* 修改倒數計時動畫樣式 */
 
 .countdown-text {
     position: absolute;
     top: 50%;
-    /* 垂直置中 */
+    /* ★ 改成 50% 確保完美垂直置中 */
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 110px;
+    /* 若覺得字太大可以稍微調小 */
     font-weight: bold;
     color: #ffda79;
     text-shadow: 0 0 25px rgba(255, 218, 121, 0.8), 2px 2px 0px #b37315;
@@ -347,8 +384,9 @@ h1 {
     pointer-events: none;
     display: none;
     text-align: center;
-    /* 確保上下字對齊 */
+    /* ★ 新增：確保上下字對齊 */
     line-height: 1.1;
+    /* ★ 新增：控制「開」跟「始」的間距 */
 }
 
 .countdown-text.pop {
@@ -376,7 +414,7 @@ h1 {
 }
 
 
-/* 預警狀態 (黃燈) */
+/* 新增：預警狀態 (黃燈) */
 
 .game-overlay.warning {
     background: #5c4a0f;
@@ -390,49 +428,8 @@ h1 {
     transform: scale(1.1) rotate(5deg);
 }
 
-/* 黃燈預警：圖片稍微晃動 */
 
-.game-overlay.warning .game-character-img {
-    transform: scale(1.1) rotate(5deg);
-}
-
-
-/* 紅燈抓人：圖片瞬間放大 */
-
-.game-overlay.danger .game-character-img {
-    transform: scale(1.25);
-}
-
-.steal-btn {
-    margin-top: 50px;
-    padding: 20px 40px;
-    font-size: 24px;
-    font-weight: bold;
-    border-radius: 50px;
-    border: none;
-    background: #e9a63b;
-    color: #110d26;
-    box-shadow: 0 8px 0 #b37315;
-    cursor: pointer;
-    touch-action: manipulation;
-    transition: transform 0.1s, box-shadow 0.1s;
-}
-
-.steal-btn:active {
-    transform: translateY(8px);
-    box-shadow: 0 0px 0 #b37315;
-}
-
-.game-hint {
-    position: absolute;
-    bottom: 5%;
-    padding: 0 20px;
-    font-size: 12px;
-    color: #887b99;
-    text-align: center;
-}
-
-/* 破紀錄提示動畫 */
+/* 新增：破紀錄提示動畫 */
 
 .new-record-msg {
     display: block;
@@ -456,7 +453,7 @@ h1 {
 }
 
 
-/* 紅燈：紅色背景 */
+/* 紅綠燈：被抓到的紅色背景 */
 
 .game-header {
     position: absolute;
@@ -496,17 +493,107 @@ h1 {
 }
 
 
-/* .game-character 樣式 */
+/* 替換原本的 .game-character 相關樣式 */
 
 .game-character-img {
     width: 160px;
     height: 160px;
     object-fit: contain;
+    /* 保持圖片比例不變形 */
     transition: transform 0.1s;
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
     user-select: none;
     -webkit-user-drag: none;
 }
+
+
+/* 黃燈預警：圖片稍微晃動 */
+
+.game-overlay.warning .game-character-img {
+    transform: scale(1.1) rotate(5deg);
+}
+
+
+/* 紅燈抓人：圖片瞬間放大，營造壓迫感 */
+
+.game-overlay.danger .game-character-img {
+    transform: scale(1.25);
+}
+
+.steal-btn {
+    margin-top: 50px;
+    padding: 20px 40px;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 50px;
+    border: none;
+    background: #e9a63b;
+    color: #110d26;
+    box-shadow: 0 8px 0 #b37315;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.steal-btn:active {
+    transform: translateY(8px);
+    box-shadow: 0 0px 0 #b37315;
+}
+
+.game-hint {
+    position: absolute;
+    bottom: 5%;
+    padding: 0 20px;
+    font-size: 12px;
+    color: #887b99;
+    text-align: center;
+}
+
+
+/* === 玉兔心理戰對話框 === */
+
+.rabbit-speech {
+    position: absolute;
+    top: -10px;
+    right: -100px;
+    /* 讓對話框飄在兔子的右上方 */
+    background: #ffffff;
+    color: #2d3436;
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    /* Q彈的浮現效果 */
+    pointer-events: none;
+    z-index: 20;
+    white-space: nowrap;
+}
+
+
+/* 對話框的小尾巴 */
+
+.rabbit-speech::before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 24px;
+    border-width: 8px 8px 0;
+    border-style: solid;
+    border-color: #ffffff transparent transparent transparent;
+}
+
+
+/* 顯示對話框時的狀態 */
+
+.rabbit-speech.show {
+    opacity: 1;
+    transform: scale(1) translateY(-10px);
+}
+
 
 /* 排行榜樣式 */
 
@@ -549,21 +636,29 @@ h1 {
 
 .toast {
     position: fixed;
-    z-index: 100;
+    z-index: 999;
+    /* ★ 設到最高，保證不會被蓋住 */
     left: 50%;
-    bottom: 18px;
-    transform: translate(-50%, 18px);
+    /* ★ 關鍵修改：從原本的 bottom 改成 top，25% 大約是在兔子的正上方 */
+    top: 25%;
+    transform: translate(-50%, -20px);
+    /* 讓動畫改成由上往下滑動 */
     width: max-content;
     max-width: 86vw;
     background: #fff3c8;
     color: #30203a;
-    padding: 10px 15px;
+    padding: 12px 18px;
     border-radius: 999px;
-    font-size: 12px;
+    font-size: 14px;
+    /* 字體稍微放大一點，更好閱讀 */
     font-weight: bold;
     opacity: 0;
     transition: .3s;
     pointer-events: none;
+    text-align: center;
+    /* 讓多行文字可以置中 */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    /* 加一點陰影更有立體感 */
 }
 
 .toast.show {
@@ -585,10 +680,6 @@ h1 {
         transform: translate3d(var(--x), 110svh, 0) rotate(500deg);
         opacity: .1;
     }
-}
-
-.lit .lantern {
-    filter: drop-shadow(0 0 28px rgba(255, 211, 93, 1));
 }
 
 .lit .scene {
@@ -616,7 +707,7 @@ h1 {
 }
 
 
-/*  月兔占卜樣式  */
+/* === 月兔占卜系統樣式 === */
 
 .divination-box {
     background: #1c103f;
@@ -634,13 +725,17 @@ h1 {
 
 .divination-animation-img {
     width: 120px;
+    /* 可以依照你的 moon.png 比例微調大小 */
     height: 120px;
     object-fit: contain;
     margin: 20px auto;
+    /* 確保圖片在彈窗中水平置中 */
     display: block;
     animation: shakeAnim 0.5s ease-in-out infinite alternate;
     filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.4));
+    /* 加入淡淡的金色發光效果 */
     -webkit-user-drag: none;
+    /* 防止手機端不小心拖曳到圖片 */
 }
 
 
@@ -690,11 +785,10 @@ h1 {
 }
 
 
-/* 開場煙火特效 */
+/* === 開場煙火特效 === */
 
 .firework-particle {
     position: fixed;
-    z-index: 99999;
     width: 6px;
     height: 6px;
     border-radius: 50%;
