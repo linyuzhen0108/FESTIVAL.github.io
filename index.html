@@ -5,20 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
     <meta name="theme-color" content="#0d0a20">
-    <title>月圓人團圓｜中秋電子賀卡 & 偷吃月餅大賽</title>
-    <!--  CSS  -->
+    <title>月圓人團圓｜中秋快樂</title>
+    <!-- 1. 引入外部 CSS 檔案 -->
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <!-- 主畫面 -->
+    <!-- 主畫面賀卡 -->
     <div class="scene" id="scene">
         <div class="stars" id="stars"></div>
-        <div class="moon" id="moon" aria-label="月亮">
-            <span class="crater c1"></span><span class="crater c2"></span><span class="crater c3"></span><span class="crater c4"></span>
-        </div>
+        <img class="moon" id="moon" src="face.png" alt="專屬月亮">
         <div class="cloud one"></div>
         <div class="cloud two"></div>
+
 
         <section class="card">
             <div class="eyebrow">妤蓁 祝你</div>
@@ -41,9 +40,10 @@
                 </button>
             </div>
         </section>
+        <div class="agent-signature">南山人壽 ｜ 林妤蓁 誠摯祝福</div>
     </div>
 
-    <!-- 入場提示：進入網站要求輸入名字 -->
+    <!-- 2. 入場提示：一進入網站就要求輸入名字 -->
     <div class="modal show" id="entryModal">
         <div class="modalbox">
             <h2>你是誰？</h2>
@@ -55,27 +55,29 @@
         </div>
     </div>
 
-    <!-- 偷吃月餅大賽 遊戲畫面 (預設隱藏) -->
+    <!-- 3. 遊戲畫面 (預設隱藏) -->
     <div class="game-overlay" id="gameOverlay">
         <div class="game-header">
             <h3>偷吃月餅大賽 🥮</h3>
             <p>分數: <span id="gameScore">0</span></p>
         </div>
 
-        <div class="game-status" id="gameStatusText">玉兔搗藥中...(快偷吃)</div>
-        <img class="game-character-img" id="gameRabbit" src="rabbit.png" alt="月兔">
+        <div class="game-status" id="gameStatusText">玉兔搗藥中...(可以偷吃)</div>
+        <div style="position: relative; margin-top: 10px;">
+            <div class="rabbit-speech" id="rabbitSpeech"></div>
+            <img class="game-character-img" id="gameRabbit" src="rabbit.png" alt="月兔">
+        </div>
 
         <button class="steal-btn" id="stealBtn">偷吃月餅！🥮</button>
         <!-- 新增：倒數計時大字 -->
         <div id="countdownDisplay" class="countdown-text"></div>
     </div>
-
-    <!-- 排行榜畫面 -->
+    <!-- 4. 排行榜畫面 -->
     <div class="modal" id="leaderboardModal">
         <div class="modalbox leaderboard-box">
             <h2>🏆 偷吃月餅排行榜</h2>
 
-            <!-- 顯示本次成績與破紀錄提示 -->
+            <!-- 新增這行：用來顯示本次成績與破紀錄提示 -->
             <div id="gameResultMsg" style="margin-bottom: 15px; font-size: 16px; color: #fff;"></div>
 
             <div id="leaderboardList" class="leaderboard-list">
@@ -89,7 +91,7 @@
     </div>
 
 
-    <!-- 月兔占卜畫面 (預設隱藏) -->
+    <!-- 5. 月兔占卜畫面 (預設隱藏) -->
     <div class="modal" id="divinationModal">
         <div class="modalbox divination-box">
             <h2 id="divinationTitle">🔮 玉兔為您求籤中...</h2>
@@ -109,13 +111,13 @@
     </div>
     <div class="toast" id="toast"></div>
 
-    <!-- Firebase 核心 (v8 版本) -->
+    <!-- 1. Firebase 核心 (v8 版本) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <!-- Firebase 資料庫功能 (v8 版本) -->
+    <!-- 2. Firebase 資料庫功能 (v8 版本) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
 
-    <!--  JS  -->
+    <!-- 引入外部 JS 檔案 -->
     <script src="script.js"></script>
 
 </body>
