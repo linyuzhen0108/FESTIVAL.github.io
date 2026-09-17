@@ -105,7 +105,6 @@ const countdownDisplay = $('countdownDisplay');
 function getDifficultyMultiplier() {
     if (gameScore >= 70) return 0.4; // 速度剩 40%
     if (gameScore >= 50) return 0.6;
-    if (gameScore >= 40) return 0.7;
     if (gameScore >= 30) return 0.8;
     if (gameScore >= 15) return 0.9;
     return 1.0; // 正常級：原本速度
@@ -114,9 +113,9 @@ function getDifficultyMultiplier() {
 function checkDifficultyLevelUp() {
     if (gameScore === 30) {
         toast("🐰 玉兔起疑心了！轉頭速度加快！");
-    } else if (gameScore === 40) {
-        toast("⚠️ 玉兔緊盯著你！極速模式！");
     } else if (gameScore === 50) {
+        toast("⚠️ 玉兔緊盯著你！極速模式！");
+    } else if (gameScore === 70) {
         toast("🔥 噩夢難度！你能撐多久？");
     }
 }
@@ -215,7 +214,6 @@ function scheduleRabbitTurn() {
 
 // 更新遊戲畫面狀態
 function updateRabbitUI() {
-    // ★ 新增這三行：只要不是綠燈，就強制收起對話框
     if (rabbitState !== 0) {
         $('rabbitSpeech').classList.remove('show');
     }
@@ -253,7 +251,7 @@ const rabbitQuotes = [
 function triggerRabbitSpeech() {
     if (!gameActive) return;
 
-    // 只有在「綠燈(0)」狀態下才會講話干擾
+    // 只有在綠燈狀態下才會講話干擾
     if (rabbitState === 0 && Math.random() > 0.4) {
         const quote = rabbitQuotes[Math.floor(Math.random() * rabbitQuotes.length)];
         const speechBubble = $('rabbitSpeech');
@@ -267,8 +265,8 @@ function triggerRabbitSpeech() {
         }, 1500);
     }
 
-    // 隨機 2~4 秒後再次判定是否講話
-    speechTimer = setTimeout(triggerRabbitSpeech, 2000 + Math.random() * 2000);
+    // 隨機是否講話
+    speechTimer = setTimeout(triggerRabbitSpeech, 1000 + Math.random() * 3000);
 }
 // 點擊「偷吃月餅」按鈕
 $('stealBtn').onclick = () => {
