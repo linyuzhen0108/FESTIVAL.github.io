@@ -1,4 +1,3 @@
-
 // 初始化 Firebase 資料庫
 let db = null;
 
@@ -90,6 +89,7 @@ function fall(sym) {
 
 // 偷吃月餅大賽
 let gameScore = 0;
+let hasInsurance = true; // 預設玩家擁有一張免死金牌
 let rabbitState = 0; // 0 = 綠燈(安全), 1 = 黃燈(預警), 2 = 紅燈(危險)
 let gameActive = false;
 let rabbitTimer;
@@ -101,6 +101,25 @@ const scoreDisplay = $('gameScore');
 const stealBtn = $('stealBtn');
 const countdownDisplay = $('countdownDisplay');
 
+// 難度控制
+function getDifficultyMultiplier() {
+    if (gameScore >= 70) return 0.4; // 速度剩 40%
+    if (gameScore >= 50) return 0.6;
+    if (gameScore >= 40) return 0.7;
+    if (gameScore >= 30) return 0.8;
+    if (gameScore >= 15) return 0.9;
+    return 1.0; // 正常級：原本速度
+}
+
+function checkDifficultyLevelUp() {
+    if (gameScore === 30) {
+        toast("🐰 玉兔起疑心了！轉頭速度加快！");
+    } else if (gameScore === 40) {
+        toast("⚠️ 玉兔緊盯著你！極速模式！");
+    } else if (gameScore === 50) {
+        toast("🔥 噩夢難度！你能撐多久？");
+    }
+}
 // 點擊開始按鈕
 $('startGameBtn').onclick = () => {
     gameOverlay.className = 'game-overlay show';
@@ -126,7 +145,7 @@ function startCountdown() {
         if (count > 0) {
             countdownDisplay.textContent = count;
             countdownDisplay.className = 'countdown-text';
-            void countdownDisplay.offsetWidth; 
+            void countdownDisplay.offsetWidth;
             countdownDisplay.className = 'countdown-text pop';
             count--;
             setTimeout(tick, 1000);
@@ -144,7 +163,7 @@ function startCountdown() {
         }
     };
 
-    tick(); 
+    tick();
 }
 // 開始遊戲
 function actualStartGame() {
@@ -152,22 +171,24 @@ function actualStartGame() {
     scoreDisplay.textContent = gameScore;
     gameActive = true;
     rabbitState = 0;
-
+    hasInsurance = true;
     // 啟用偷吃按鈕
     stealBtn.disabled = false;
     stealBtn.style.opacity = '1';
 
     updateRabbitUI();
     scheduleRabbitTurn();
+    triggerRabbitSpeech();
     toast('遊戲開始！趁玉兔沒看時偷吃！');
 }
 // 兔子的三階段轉頭機制
 function scheduleRabbitTurn() {
     if (!gameActive) return;
+    const multiplier = getDifficultyMultiplier();
 
     if (rabbitState === 0) {
         // 綠燈：隨機 1~3 秒後進入黃燈 (預警)
-        const delay = Math.random() * 2000 + 1000;
+        const delay = (Math.random() * 2000 + 1000) * multiplier;
         rabbitTimer = setTimeout(() => {
             rabbitState = 1;
             updateRabbitUI();
@@ -175,7 +196,7 @@ function scheduleRabbitTurn() {
         }, delay);
     } else if (rabbitState === 1) {
         // 黃燈：預警狀態，大約 0.5~0.8 秒後立刻轉紅燈
-        const warningTime = Math.random() * 300 + 500;
+        const warningTime = (Math.random() * 300 + 500) * multiplier;
         rabbitTimer = setTimeout(() => {
             rabbitState = 2;
             updateRabbitUI();
@@ -183,7 +204,7 @@ function scheduleRabbitTurn() {
         }, warningTime);
     } else if (rabbitState === 2) {
         // 紅燈：隨機盯著 1~2.5 秒後轉回綠燈
-        const dangerTime = Math.random() * 1500 + 1000;
+        const dangerTime = (Math.random() * 1500 + 1000) * multiplier;
         rabbitTimer = setTimeout(() => {
             rabbitState = 0;
             updateRabbitUI();
@@ -194,6 +215,11 @@ function scheduleRabbitTurn() {
 
 // 更新遊戲畫面狀態
 function updateRabbitUI() {
+    // ★ 新增這三行：只要不是綠燈，就強制收起對話框
+    if (rabbitState !== 0) {
+        $('rabbitSpeech').classList.remove('show');
+    }
+
     if (rabbitState === 2) {
         // 紅燈：轉正面看人
         gameRabbit.src = 'see.png';
@@ -211,17 +237,81 @@ function updateRabbitUI() {
         gameOverlay.className = 'game-overlay show';
     }
 }
+
+// === 玉兔心理戰干擾系統 ===
+let speechTimer;
+const rabbitQuotes = [
+    "我好像聽到偷吃的聲音...",
+    "妤蓁說不能吃太多喔！",
+    "我要轉頭了喔... ",
+    "背後感覺涼涼的？",
+    "你是不是在狂點按鈕？",
+    "搗藥好累，想偷懶...",
+    "再吃會變胖喔～"
+];
+
+function triggerRabbitSpeech() {
+    if (!gameActive) return;
+
+    // 只有在「綠燈(0)」狀態下才會講話干擾
+    if (rabbitState === 0 && Math.random() > 0.4) {
+        const quote = rabbitQuotes[Math.floor(Math.random() * rabbitQuotes.length)];
+        const speechBubble = $('rabbitSpeech');
+
+        speechBubble.textContent = quote;
+        speechBubble.classList.add('show');
+
+        // 顯示 1.5 秒後自動隱藏
+        setTimeout(() => {
+            speechBubble.classList.remove('show');
+        }, 1500);
+    }
+
+    // 隨機 2~4 秒後再次判定是否講話
+    speechTimer = setTimeout(triggerRabbitSpeech, 2000 + Math.random() * 2000);
+}
 // 點擊「偷吃月餅」按鈕
 $('stealBtn').onclick = () => {
     if (!gameActive) return;
 
+    const stealBtn = $('stealBtn'); // 取得按鈕元素以便後續操作
+
     if (rabbitState === 2) {
-        // 紅燈時點擊 -> 抓到了！遊戲結束
-        gameOver();
+        // 紅燈時點擊 -> 判斷有沒有保險！
+        if (hasInsurance) {
+            hasInsurance = false; // 消耗保險
+            toast("🛡️ 意外發生！妤蓁為你擋下一次風險！(免死金牌 -1)");
+
+            // 畫面震動或特效提示
+            gameOverlay.style.animation = "shakeAnim 0.5s";
+            setTimeout(() => gameOverlay.style.animation = "", 500);
+
+            // ★ 新增：強制鎖定按鈕 1.5 秒，防止玩家煞車不及狂點
+            stealBtn.disabled = true;
+            stealBtn.style.opacity = '0.5';
+            stealBtn.textContent = '🛡️ 保障發揮中...';
+
+            // 1.5 秒後解除鎖定，讓玩家可以繼續遊戲
+            setTimeout(() => {
+                if (gameActive) { // 確保遊戲還沒結束才恢復按鈕
+                    stealBtn.disabled = false;
+                    stealBtn.style.opacity = '1';
+                    stealBtn.textContent = '偷吃月餅！🥮';
+                }
+            }, 1500);
+
+        } else {
+            gameOver();
+        }
     } else {
         // 綠燈或黃燈時點擊 -> 成功偷吃 
         gameScore++;
         scoreDisplay.textContent = gameScore;
+
+        // 保留你新增的難度升級功能！
+        if (typeof checkDifficultyLevelUp === "function") {
+            checkDifficultyLevelUp();
+        }
 
         gameRabbit.style.transform = 'scale(0.9) translateX(-10px)';
         setTimeout(() => { if (gameActive && rabbitState === 0) gameRabbit.style.transform = 'scale(1)'; }, 100);
@@ -231,6 +321,8 @@ $('stealBtn').onclick = () => {
 function gameOver() {
     gameActive = false;
     clearTimeout(rabbitTimer);
+    clearTimeout(speechTimer); // ★ 新增這行：遊戲結束停止講話
+    $('rabbitSpeech').classList.remove('show'); // 隱藏對話框
     gameOverlay.className = 'game-overlay'; // 關閉遊戲畫面
 
     saveScoreAndShowLeaderboard();
@@ -263,8 +355,8 @@ async function saveScoreAndShowLeaderboard() {
 
         // 從雲端抓取「全球前 10 名」的分數
         const snapshot = await db.collection("mooncake_scores")
-            .orderBy("score", "desc") 
-            .limit(10) 
+            .orderBy("score", "desc")
+            .limit(10)
             .get();
 
         let leaderboard = [];
@@ -272,19 +364,45 @@ async function saveScoreAndShowLeaderboard() {
             leaderboard.push(doc.data());
         });
 
-        // 判斷本次成績的文字顯示
-        let currentRankText = "";
+        // 判斷本次成績
+        let rankBadge = "";
+        let careMessage = "";
         const rankIndex = leaderboard.findIndex(entry => entry.score <= gameScore && entry.name === playerName);
 
-        if (rankIndex !== -1) {
-            currentRankText = `🏆 本次全球排名：第 <b>${rankIndex + 1}</b> 名`;
-            toast(`擠進全球前 10 名啦！吃了 ${gameScore} 顆！`);
+        if (rankIndex !== -1 && rankIndex < 10) {
+            // 情境 1：擠進全球前 10 名的大神
+            rankBadge = `🏆 榮登全球第 <b>${rankIndex + 1}</b> 名！`;
+            careMessage = `吃成大胖子啦！反應敏銳又果決～<br>人生就像這場挑戰，未來的各項保障與風險規劃，就交給妤蓁為您精準把關！`;
+            toast(`太神啦！成功擠進全球前 10 名！吃了 ${gameScore} 顆！`);
+        } else if (gameScore >= 30) {
+            // 情境 2：拿到 30 分以上的高手
+            rankBadge = `🔥 實力派高手：偷吃了 <b>${gameScore}</b> 顆！`;
+            careMessage = `表現超亮眼！差一點就登頂了！<br>月圓人團圓，妤蓁祝福您下半年步步高升、事業與健康皆圓滿！`;
+            toast(`好身手！吃了 ${gameScore} 顆月餅！`);
+        } else if (gameScore >= 10) {
+            // 情境 3：拿 10 ~ 29 分的普通玩家
+            rankBadge = `😋 品嚐了 <b>${gameScore}</b> 顆月餅！`;
+            careMessage = `美味月餅下肚，甜在心裡！<br>享受節慶氛圍之餘，也別忘了多喝茶解膩，妤蓁隨時關心您的健康與平安！`;
+            toast(`被玉兔發現了！吃了 ${gameScore} 顆！`);
         } else {
-            currentRankText = `💪 本次偷吃：<b>${gameScore}</b> 顆 (未擠進全球前 10)`;
-            toast(`被抓到了！吃了 ${gameScore} 顆！`);
+            // 情境 4：10 分以下（剛開始就被抓到的手滑玩家）
+            rankBadge = `🐰 玉兔眼力太好啦！(吃了 <b>${gameScore}</b> 顆)`;
+            careMessage = `哈哈別氣餒！雖然遊戲裡有玉兔盯著，<br>但現實生活中，有妤蓁在南山為您築起保護傘，讓您隨時都安心！`;
+            toast(`剛偷吃就被抓到了！再玩一次一定更棒！`);
         }
 
-        resultMsg.innerHTML = `遊戲結束！<br><span style="color: #ffda79; font-size: 15px; display: inline-block; margin-top: 5px;">${currentRankText}</span>`;
+        // 組合完整的結算畫面 (質感金色排版 + 專屬署名)
+        resultMsg.innerHTML = `
+            <div style="font-size: 19px; font-weight: bold; color: #ffda79; margin-bottom: 8px;">
+                ${rankBadge}
+            </div>
+            <div style="font-size: 14px; line-height: 1.6; color: #f5f6fa; margin-bottom: 12px;">
+                ${careMessage}
+            </div>
+            <div style="font-size: 12px; color: #feca57; font-weight: bold; letter-spacing: 1.5px; border-top: 1px dashed rgba(254, 202, 87, 0.4); padding-top: 8px;">
+                🌸 南山人壽 妤蓁 誠摯守護 🌸
+            </div>
+        `;
 
         // 渲染雲端排行榜
         renderLeaderboard(leaderboard);
@@ -343,14 +461,12 @@ $('closeLeaderboardBtn').onclick = () => {
 
 // 籤詩資料庫 
 const fortunes = [
-    { level: "大吉 🌕", text: "滿月賜福，好運爆棚！近期將有意想不到的好消息降臨，財運與桃花雙豐收！" },
-    { level: "上吉 🐇", text: "玉兔送安，諸事順遂。工作或學業上的努力即將獲得回報，繼續保持現在的步調！" },
-    { level: "中吉 🌸", text: "桂花飄香，貴人相助。遇到困難時，留意身邊的朋友，他們會給你帶來很大的幫助。" },
-    { level: "小吉 🥮", text: "吃口月餅，小確幸不斷。今天適合放慢腳步，享受與家人朋友相聚的溫馨時光。" },
-    { level: "特吉 ✨", text: "嫦娥仙子偷偷為你加持！近期願望成真的機率大幅提升，想做什麼就勇敢去做吧！" },
-    { level: "平吉 🍵", text: "清茶一杯，歲月靜好。沒有壞事發生就是最好的事，享受這段平穩安康的日子。" }
+    { level: "大吉 ✨", text: "嫦娥仙子偷偷為你加持！近期願望成真的機率大幅提升，想做什麼就勇敢去做吧！妤蓁祝您中秋佳節愉快！" },
+    { level: "中吉 🌸", text: "月圓圓，錢包也圓圓！投資理財還是人生規劃都讓妤蓁陪您一起守護家人與未來。" },
+    { level: "小吉 🥮", text: "生活難免有小波折，但別擔心，就像月有陰晴圓缺，妤蓁會一直在南山人壽為您撐起保護傘！" },
+    { level: "吉 🐇", text: "花好月圓人團圓，健康平安就是最大的財富。您的專屬守護員妤蓁，隨時為您把關！" },
+    { level: "末吉 🍵", text: "清茶一杯，歲月靜好。沒有壞事發生就是最好的事，享受與家人朋友相聚的溫馨時光。" },
 ];
-
 // 點擊占卜按鈕
 $('divinationBtn').onclick = () => {
     // 1. 初始化 / 重置彈窗狀態
@@ -369,13 +485,13 @@ $('divinationBtn').onclick = () => {
 
         // 3. 更新畫面顯示結果
         $('divinationTitle').textContent = `✨ ${playerName} 的專屬中秋籤詩`;
-        $('divinationAnim').style.display = "none"; 
+        $('divinationAnim').style.display = "none";
 
         $('fortuneLevel').textContent = randomFortune.level;
         $('fortuneText').textContent = randomFortune.text;
-        $('divinationResult').style.display = "block"; 
+        $('divinationResult').style.display = "block";
 
-        $('closeDivinationBtn').style.display = "block"; 
+        $('closeDivinationBtn').style.display = "block";
 
         // 撒下星星特效慶祝
         for (let i = 0; i < 8; i++) fall('✨');
@@ -395,7 +511,7 @@ function launchFireworks() {
     const container = document.body;
     const colors = ['#ffda79', '#ff9ff3', '#feca57', '#48dbfb', '#1dd1a1', '#ff7675'];
 
-    const numFireworks = 5 + Math.floor(Math.random() * 4); 
+    const numFireworks = 5 + Math.floor(Math.random() * 4);
 
     for (let f = 0; f < numFireworks; f++) {
         setTimeout(() => {
@@ -435,6 +551,6 @@ function launchFireworks() {
                     if (p.parentNode) p.remove();
                 }, duration * 1000 + 100);
             }
-        }, f * 500 + Math.random() * 300); 
+        }, f * 500 + Math.random() * 300);
     }
 }
