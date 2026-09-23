@@ -23,7 +23,9 @@ button {
 
 .scene {
     position: relative;
-    min-height: 100svh;
+    height: 100dvh;
+    /* 改用 dvh (Dynamic Viewport Height) */
+    min-height: 100%;
     overflow: hidden;
     background: radial-gradient(circle at 50% 27%, rgba(255, 216, 117, .14), transparent 23%), linear-gradient(180deg, #0b0920 0%, #15102e 52%, #342044 100%);
 }
@@ -151,17 +153,19 @@ button {
     z-index: 5;
     left: 5%;
     right: 5%;
-    bottom: calc(4vh + env(safe-area-inset-bottom));
-    height: 50vh;
-    display: flex;
-    flex-direction: column;
-    padding: 25px 18px 20px;
+    /* 稍微提高底部距離，避開選單列 */
+    bottom: calc(max(20px, env(safe-area-inset-bottom)) + 25px);
+    padding: 18px 15px 15px;
+    /* 縮小內邊距節省空間 */
     text-align: center;
     background: rgba(13, 10, 32, .58);
     border: 1px solid rgba(255, 220, 135, .23);
     border-radius: 24px;
     backdrop-filter: blur(9px);
     box-shadow: 0 16px 55px rgba(0, 0, 0, .32);
+    /* 新增：防止卡片過高，內容過多時會自動開啟局部滑動 */
+    max-height: 55dvh;
+    overflow-y: auto;
 }
 
 .eyebrow {
@@ -184,9 +188,9 @@ h1 {
 }
 
 .wish {
-    font-size: 15px;
-    line-height: 1.9;
-    margin: 14px 0 13px;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 10px 0 12px;
     color: #fff7df;
 }
 
@@ -203,20 +207,15 @@ h1 {
 }
 
 .actions button {
-    min-height: 48px;
-    border-radius: 15px;
+    min-height: 42px;
+    /* 稍微縮小按鈕高度 */
+    border: 1px solid rgba(255, 215, 120, .28);
+    border-radius: 13px;
+    background: rgba(255, 205, 90, .08);
+    color: #fff6d5;
+    font-size: 13px;
     cursor: pointer;
     touch-action: manipulation;
-    margin-bottom: 18px;
-    width: 100%;
-    background: linear-gradient(180deg, #ffda79 0%, #f39c12 100%);
-    border: 2px solid #fff;
-    color: #fff6d5;
-    font-size: 15px;
-    font-weight: bold;
-    letter-spacing: 1px;
-    box-shadow: 0 6px 0 #d35400, 0 10px 15px rgba(243, 156, 18, 0.4);
-    transition: all 0.1s ease;
 }
 
 
